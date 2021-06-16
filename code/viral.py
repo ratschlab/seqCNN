@@ -3,9 +3,9 @@ import pandas as pd
 from tqdm import tqdm, trange
 from plotly import graph_objects as go
 
-from dataset import ViralDataset
-import embed 
-import sequence
+from code.dataset import ViralDataset
+from code import embed 
+from code import sequence
     
 
 def get_embedings(num_layers = 8, kernel=3, groups=4, device='cuda', max_len=1500, min_len=0, stride_ratio=1./4):

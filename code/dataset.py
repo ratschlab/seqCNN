@@ -2,7 +2,8 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 import torch
 import numpy as np
-from config import config 
+
+from code.config import config 
 
 
 class ViralDataset(Dataset):

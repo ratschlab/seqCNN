@@ -8,8 +8,8 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm, trange
 
-from config import config 
-import models
+from code.config import config 
+from code import models
 
 
 def load_pretrained_net( groups, kernel, num_layers, stride=2,in_channels=4, channels=1, i=0):
