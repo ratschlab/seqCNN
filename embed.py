@@ -2,7 +2,6 @@ import glob
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from plotly import graph_objects as go
 import editdistance
 
 import torch 
@@ -138,23 +137,3 @@ def sample_edit_vs_embed_dists(edit_dists, embed_dists, neighbors):
     ax2.grid('on')
     ax1.legend([f"seq {i}" for i in rinds])
 
-
-def embed_vs_ed(dataset, samples, x, y):
-    def print_seq(trace, points, selector):
-        pi = points.point_inds[0]
-        name1, name2 = samples.name1.iloc[pi], samples.name2.iloc[pi]
-        i, j = data.s1.iloc[pi], data.s2.iloc[pi]
-        s1, s2 = dataset.get_seq(i), dataset.get_seq(j)
-        s1, s2 = vec2seq(s1), vec2seq(s2)
-        print(f"id 1 = {name1}, id2 = {name2}\n\n{s1}\n{s2}")
-    trcol = lambda alpha: f'rgba(0,0,0,{alpha})'
-
-    fig = go.FigureWidget()
-    fig.add_trace(go.Scatter(x=samples[x], 
-                             y=samples[y],
-                             mode='markers', 
-                             marker_size=2,
-                             name='sample'))
-
-    fig.data[0].on_click(callback=print_seq)
-    return fig

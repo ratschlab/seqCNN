@@ -97,3 +97,6 @@ def align_viewer(seq1, seq2, col_width = 100, edit_markers=" .><", p=2):
         print(vec2seq(edits,edit_markers)[l1:l2])
         print(x[l1:l2])
         print(y[l1:l2])
+        
+        
+        

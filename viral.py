@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm, trange
+from plotly import graph_objects as go
 
 from dataset import ViralDataset
 import embed 
@@ -55,12 +56,12 @@ def target_summary(embeddings, samples, dataset, target, index, print_info = Tru
             seq2 = dataset.seqs[id2][pos2+sh:pos2+sh+dataset.L]
             if len(seq1)!=len(seq2):
                 continue
-            ed = editDist(seq1,seq2)
+            ed = sequence.editDist(seq1,seq2)
             hd = np.sum(seq1!=seq2)
             if sh==0:
                 ed_org = ed
                 hd_org = hd
-                s1, s2 = vec2seq(seq1),vec2seq(seq2)
+                s1, s2 = sequence.vec2seq(seq1),sequence.vec2seq(seq2)
                 _, edits, _, _ = sequence.align(s1, s2,p=2) 
                 op = sequence.edit_ops_desc(edits)
                 desc = "\t".join([f"{k}:{v}" for k,v in op.items()])
@@ -82,3 +83,24 @@ def target_summary(embeddings, samples, dataset, target, index, print_info = Tru
                   f"{ed_org}\t{ed_min}\t{ed_sh}\n"
                   f"{hd_org}\t{hd_min}\t{hd_sh}")
     return df
+
+
+def embed_vs_ed(dataset, samples, x, y):
+    def print_seq(trace, points, selector):
+        pi = points.point_inds[0]
+        name1, name2 = samples.name1.iloc[pi], samples.name2.iloc[pi]
+        i, j = data.s1.iloc[pi], data.s2.iloc[pi]
+        s1, s2 = dataset.get_seq(i), dataset.get_seq(j)
+        s1, s2 = sequence.vec2seq(s1), vec2seq(s2)
+        print(f"id 1 = {name1}, id2 = {name2}\n\n{s1}\n{s2}")
+    trcol = lambda alpha: f'rgba(0,0,0,{alpha})'
+
+    fig = go.FigureWidget()
+    fig.add_trace(go.Scatter(x=samples[x], 
+                             y=samples[y],
+                             mode='markers', 
+                             marker_size=2,
+                             name='sample'))
+
+    fig.data[0].on_click(callback=print_seq)
+    return fig
