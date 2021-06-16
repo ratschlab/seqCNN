@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from plotly import graph_objects as go
+import editdistance
 
 import torch 
 from torch.utils.data import DataLoader, Dataset
@@ -10,7 +11,6 @@ from tqdm import tqdm, trange
 
 from config import config 
 import models
-
 
 
 def load_pretrained_net( groups, kernel, num_layers, stride=2,in_channels=4, channels=1, i=0):
@@ -158,27 +158,3 @@ def embed_vs_ed(dataset, samples, x, y):
 
     fig.data[0].on_click(callback=print_seq)
     return fig
-
-
-def edit_ops_desc(edits):
-    ed2name = {0: 'c', 1: 's', 2: 'i', 3: 'd'}
-    op,cnt = np.unique(edits, return_counts=True)
-    op = {ed2name[o]:cnt[i] for i,o in enumerate(op)}
-    return op
-
-
-def vec2seq(s, Alph="acgt"):
-    return "".join([Alph[x] for x in s])
-
-
-def seq_alignment_viewer(seq1, seq2, col_width = 100, edit_markers=" .><", p=2):
-    s1, s2 = vec2seq(seq1), vec2seq(seq2)
-    ed, edits, x, y = seqgen.align(s1, s2,p) 
-    print(edit_ops_desc(edits))
-
-    for i in range(0,len(s1), col_width):
-        l1, l2 = i, i+col_width
-        print("")
-        print(vec2seq(edits,edit_markers)[l1:l2])
-        print(x[l1:l2])
-        print(y[l1:l2])

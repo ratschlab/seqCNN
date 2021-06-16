@@ -1,7 +1,10 @@
 import numpy as np
+import pandas as pd
+from tqdm import tqdm, trange
 
 from dataset import ViralDataset
 import embed 
+import sequence
     
 
 def get_embedings(num_layers = 8, kernel=3, groups=4, device='cuda', max_len=1500, min_len=0, stride_ratio=1./4):
@@ -24,7 +27,7 @@ def get_edit_dists(dataset):
     return edit_dists
     
     
-def target_summary(dataset, target, index, print_info = True, max_sh=1):   
+def target_summary(embeddings, samples, dataset, target, index, print_info = True, max_sh=1):   
     I0, J = np.nonzero(target)
     I = samples[I0]
     neq = J!=I
@@ -58,8 +61,8 @@ def target_summary(dataset, target, index, print_info = True, max_sh=1):
                 ed_org = ed
                 hd_org = hd
                 s1, s2 = vec2seq(seq1),vec2seq(seq2)
-                _, edits, _, _ = seqgen.align(s1, s2,p=2) 
-                op = edit_ops_desc(edits)
+                _, edits, _, _ = sequence.align(s1, s2,p=2) 
+                op = sequence.edit_ops_desc(edits)
                 desc = "\t".join([f"{k}:{v}" for k,v in op.items()])
             if hd_min==None or hd<hd_min:
                 hd_min, hd_sh = hd, sh
