@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm, trange
 from plotly import graph_objects as go
+import os
 
 from code.dataset import ViralDataset
 from code import embed 
@@ -20,10 +21,13 @@ def get_embedings(num_layers = 8, kernel=3, groups=4, device='cuda', max_len=150
     return dataset, embeddings
 
 def get_edit_dists(dataset):
-    # edit_dists = pairwise_edit_dist(dataset)
-    # np.savez(f'viral_ed_L{L}_max_len{max_len}', edit_dists=edit_dists)
-    data = np.load(f"data/viral_ed_L{dataset.L}_max_len{dataset.max_len}.npz", allow_pickle=True)
-    edit_dists = data['edit_dists']
+    file = f"data/viral_ed_L{dataset.L}_max_len{dataset.max_len}.npz"
+    if os.path.exists(file):
+        data = np.load(file, allow_pickle=True)
+        edit_dists = data['edit_dists']
+    else:
+        edit_dists = pairwise_edit_dist(dataset)
+        np.savez(file.replace('.npz',''), edit_dists=edit_dists)
     print(f"calculated for {len(dataset)} substrings, forming {np.sum(edit_dists>0)} pairs")
     return edit_dists
     
@@ -83,6 +87,20 @@ def target_summary(embeddings, samples, dataset, target, index, print_info = Tru
                   f"{ed_org}\t{ed_min}\t{ed_sh}\n"
                   f"{hd_org}\t{hd_min}\t{hd_sh}")
     return df
+
+def summary_viewer(df, dataset, r=None):
+    if r==None:
+        r = np.random.randint(len(df))
+    sh1,sh2 = 0,0
+    L = dataset.L  
+
+    i1,j1,i2,j2 = df[['id1','pos1', 'id2', 'pos2']].iloc[r]
+    id1,id2 = dataset.ids[i1], dataset.ids[i2]
+
+    s1, s2 = dataset.seqs[i1][j1+sh1:j1+sh1+L], dataset.seqs[i2][j2+sh2:j2+sh2+L]
+    print(f"{id1} | {j1} ")
+    print(f"{id2} | {j2} ")
+    sequence.align_viewer(s1,s2,p=-1)
 
 
 def embed_vs_ed(dataset, samples, x, y):
